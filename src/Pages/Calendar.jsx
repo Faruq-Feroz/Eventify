@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 
+// Define your deployed backend URL here
+const API_URL = "https://eventify-backend-o3lh.onrender.com";
+
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
@@ -8,8 +11,8 @@ const Calendar = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Use the full URL to your backend server
-        const response = await fetch('http://localhost:5000/api/events/upcoming', {
+        // Use the full URL to your deployed backend server
+        const response = await fetch(`${API_URL}/api/events/upcoming`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -71,9 +74,7 @@ const Calendar = () => {
       const currentDayDate = new Date(year, month, day);
       const dateString = currentDayDate.toISOString().split('T')[0];
       
-      const dayEvents = events.filter(event => {
-        return event.event_date === dateString;
-      });
+      const dayEvents = events.filter(event => event.event_date === dateString);
 
       days.push(
         <div key={day} className={`calendar-day ${dayEvents.length > 0 ? 'has-event' : ''}`}>
