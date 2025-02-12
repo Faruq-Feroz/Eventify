@@ -6,8 +6,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 // Import logos
-import lightLogo from '../assets/logo.png';
-import darkLogo from '../assets/logo-dark-mode.png';
+import lightLogo from '../assets/Logo.png';
+import darkLogo from '../assets/Logo-dark-mode.png';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
