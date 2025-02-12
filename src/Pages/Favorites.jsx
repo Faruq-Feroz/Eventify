@@ -1,4 +1,3 @@
-// Frontend: Favorites.jsx
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
@@ -12,6 +11,9 @@ import {
   faBoxArchive 
 } from "@fortawesome/free-solid-svg-icons";
 
+// Define your deployed backend URL here.
+const API_URL = "https://eventify-backend-o3lh.onrender.com";
+
 const Favorites = () => {
   const [viewType, setViewType] = useState("grid");
   const [events, setEvents] = useState([]);
@@ -22,7 +24,7 @@ const Favorites = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/events/favorites");
+        const response = await fetch(`${API_URL}/api/events/favorites`);
         if (!response.ok) throw new Error("Failed to fetch favorite events");
         
         const data = await response.json();
@@ -41,7 +43,7 @@ const Favorites = () => {
 
   const toggleFavorite = async (eventId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/events/${eventId}/favorite`, {
+      const response = await fetch(`${API_URL}/api/events/${eventId}/favorite`, {
         method: "PUT",
       });
       if (!response.ok) throw new Error("Failed to update favorite status");
@@ -68,7 +70,7 @@ const Favorites = () => {
 
   const toggleArchive = async (eventId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/events/${eventId}/archive`, {
+      const response = await fetch(`${API_URL}/api/events/${eventId}/archive`, {
         method: "PUT",
       });
       if (!response.ok) throw new Error("Failed to update archive status");
@@ -88,7 +90,7 @@ const Favorites = () => {
 
   const deleteEvent = async (eventId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/events/${eventId}`, {
+      const response = await fetch(`${API_URL}/api/events/${eventId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete event");
@@ -135,7 +137,7 @@ const Favorites = () => {
             <div key={event._id} className="event-card">
               {event.image_url && (
                 <img 
-                  src={`http://localhost:5000${event.image_url}`} 
+                  src={`${API_URL}${event.image_url}`} 
                   alt={event.title} 
                   className="event-image" 
                 />
