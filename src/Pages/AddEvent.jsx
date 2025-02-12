@@ -43,9 +43,12 @@ const AddEvent = () => {
     });
 
     try {
-      await axios.post("http://localhost:5000/api/events", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // Update the URL to your deployed backend
+      await axios.post(
+        "https://eventify-backend-o3lh.onrender.com/api/events",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
       showAlert("✅ Event added successfully!");
 
@@ -74,50 +77,111 @@ const AddEvent = () => {
         {/* Event Title */}
         <div className="form-group">
           <label htmlFor="event-title">Event Title:</label>
-          <input type="text" id="event-title" name="title" value={eventData.title} onChange={handleChange} placeholder="Enter event title" required />
+          <input
+            type="text"
+            id="event-title"
+            name="title"
+            value={eventData.title}
+            onChange={handleChange}
+            placeholder="Enter event title"
+            required
+          />
         </div>
 
         {/* Event Description */}
         <div className="form-group">
           <label htmlFor="event-description">Event Description:</label>
-          <textarea id="event-description" name="description" rows="5" value={eventData.description} onChange={handleChange} placeholder="Enter event description" required></textarea>
+          <textarea
+            id="event-description"
+            name="description"
+            rows="5"
+            value={eventData.description}
+            onChange={handleChange}
+            placeholder="Enter event description"
+            required
+          ></textarea>
         </div>
 
         {/* Event Date */}
         <div className="form-group">
           <label htmlFor="event-date">Event Date:</label>
-          <input type="date" id="event-date" name="event_date" value={eventData.event_date} onChange={handleChange} required />
+          <input
+            type="date"
+            id="event-date"
+            name="event_date"
+            value={eventData.event_date}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         {/* Event Time */}
         <div className="form-group">
           <label htmlFor="event-time">Event Time:</label>
-          <input type="time" id="event-time" name="time" value={eventData.time} onChange={handleChange} required />
+          <input
+            type="time"
+            id="event-time"
+            name="time"
+            value={eventData.time}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         {/* Event Location */}
         <div className="form-group">
           <label htmlFor="event-location">Event Location:</label>
-          <input type="text" id="event-location" name="location" value={eventData.location} onChange={handleChange} placeholder="Enter event location" required />
+          <input
+            type="text"
+            id="event-location"
+            name="location"
+            value={eventData.location}
+            onChange={handleChange}
+            placeholder="Enter event location"
+            required
+          />
         </div>
 
         {/* Event Organizer */}
         <div className="form-group">
           <label htmlFor="event-organizer">Organizer Name:</label>
-          <input type="text" id="event-organizer" name="organizer" value={eventData.organizer} onChange={handleChange} placeholder="Enter organizer name" />
+          <input
+            type="text"
+            id="event-organizer"
+            name="organizer"
+            value={eventData.organizer}
+            onChange={handleChange}
+            placeholder="Enter organizer name"
+          />
         </div>
 
-        {/* Max Attendees */}
+        {/* Maximum Attendees */}
         <div className="form-group">
           <label htmlFor="event-attendees">Maximum Attendees:</label>
-          <input type="number" id="event-attendees" name="max_attendees" value={eventData.max_attendees} onChange={handleChange} placeholder="Enter maximum number of attendees" min="1" />
+          <input
+            type="number"
+            id="event-attendees"
+            name="max_attendees"
+            value={eventData.max_attendees}
+            onChange={handleChange}
+            placeholder="Enter maximum number of attendees"
+            min="1"
+          />
         </div>
 
         {/* Event Category */}
         <div className="form-group">
           <label htmlFor="event-category">Event Category:</label>
-          <select id="event-category" name="category" value={eventData.category} onChange={handleChange} required>
-            <option value="" disabled>Select a category</option>
+          <select
+            id="event-category"
+            name="category"
+            value={eventData.category}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
             <option value="conference">Conference</option>
             <option value="workshop">Workshop</option>
             <option value="seminar">Seminar</option>
@@ -131,13 +195,23 @@ const AddEvent = () => {
         {/* Event Image */}
         <div className="form-group">
           <label htmlFor="event-image">Upload Event Image:</label>
-          <input type="file" id="event-image" name="image" accept="image/*" onChange={handleFileChange} />
+          <input
+            type="file"
+            id="event-image"
+            name="image"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
         </div>
 
         {/* Form Actions */}
         <div className="form-actions">
-          <button type="submit" className="btn">Add Event</button>
-          <a href="/" className="btn cancel-btn">Cancel</a>
+          <button type="submit" className="btn">
+            Add Event
+          </button>
+          <a href="/" className="btn cancel-btn">
+            Cancel
+          </a>
         </div>
       </form>
 
@@ -145,7 +219,9 @@ const AddEvent = () => {
       {alert.visible && (
         <div id="alert-popup" className="alert-popup">
           <p id="alert-message">{alert.message}</p>
-          <button onClick={() => setAlert({ message: "", visible: false })}>OK</button>
+          <button onClick={() => setAlert({ message: "", visible: false })}>
+            OK
+          </button>
         </div>
       )}
     </section>
