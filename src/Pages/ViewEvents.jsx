@@ -10,7 +10,6 @@ import {
   faEdit,
   faTrash,
   faBoxArchive,
-
 } from "@fortawesome/free-solid-svg-icons";
 
 /**
@@ -41,7 +40,7 @@ const ViewEvents = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/events");
+        const response = await fetch("https://eventify-backend-o3lh.onrender.com/api/events");
         if (!response.ok) throw new Error("Failed to fetch events");
 
         const data = await response.json();
@@ -62,7 +61,7 @@ const ViewEvents = () => {
   const toggleFavorite = async (eventId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${eventId}/favorite`,
+        `https://eventify-backend-o3lh.onrender.com/api/events/${eventId}/favorite`,
         { method: "PUT" }
       );
       if (!response.ok) throw new Error("Failed to update favorite status");
@@ -90,7 +89,7 @@ const ViewEvents = () => {
   const toggleArchive = async (eventId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${eventId}/archive`,
+        `https://eventify-backend-o3lh.onrender.com/api/events/${eventId}/archive`,
         { method: "PUT" }
       );
       if (!response.ok) throw new Error("Failed to update archive status");
@@ -111,7 +110,7 @@ const ViewEvents = () => {
   const deleteEvent = async (eventId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/events/${eventId}`,
+        `https://eventify-backend-o3lh.onrender.com/api/events/${eventId}`,
         { method: "DELETE" }
       );
       if (!response.ok) throw new Error("Failed to delete event");
@@ -152,9 +151,6 @@ const ViewEvents = () => {
       {/* HEADER */}
       <div className="events-header">
         <h1>All Events</h1>
-
-       
-
         {/* Sort & View Controls */}
         <div className="header-controls">
           <div className="sort-control">
@@ -169,7 +165,6 @@ const ViewEvents = () => {
               <option value="latest">Latest First</option>
             </select>
           </div>
-
           <div className="view-controls">
             <button
               className={`view-toggle ${viewType === "grid" ? "active" : ""}`}
@@ -202,19 +197,17 @@ const ViewEvents = () => {
               {event.image_url && (
                 <div className="event-card-image">
                   <img
-                    src={`http://localhost:5000${event.image_url}`}
+                    src={`https://eventify-backend-o3lh.onrender.com${event.image_url}`}
                     alt={event.title}
                     className="event-image"
                   />
                 </div>
               )}
-
               {/* Content */}
               <div className="event-card-content">
                 <div className="event-card-header">
                   <h3 className="event-title">{event.title}</h3>
                 </div>
-
                 <div className="event-details">
                   <p>
                     <FontAwesomeIcon icon={faCalendarAlt} className="icon" />{" "}
@@ -224,14 +217,12 @@ const ViewEvents = () => {
                     {event.location}
                   </p>
                 </div>
-
                 {/* Truncated Description */}
                 {event.description && (
                   <p className="event-description">
                     {truncateWords(event.description, 10)}
                   </p>
                 )}
-
                 {/* Actions */}
                 <div className="event-actions">
                   <button
