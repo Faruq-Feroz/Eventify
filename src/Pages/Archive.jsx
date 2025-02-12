@@ -1,4 +1,3 @@
-// Frontend: Archive.jsx
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -17,11 +16,14 @@ const Archive = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
+  // Use your deployed backend URL
+  const API_URL = "https://eventify-backend-o3lh.onrender.com";
+
   // Fetch archived events on component mount
   useEffect(() => {
     const fetchArchivedEvents = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/events/archived");
+        const response = await fetch(`${API_URL}/api/events/archived`);
         if (!response.ok) throw new Error("Failed to fetch archived events");
         const data = await response.json();
         setEvents(data);
@@ -49,7 +51,7 @@ const Archive = () => {
   const toggleArchive = async (eventId) => {
     try {
       // We send a JSON body to indicate that we want to unarchive this event.
-      const response = await fetch(`http://localhost:5000/api/events/${eventId}/archive`, {
+      const response = await fetch(`${API_URL}/api/events/${eventId}/archive`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -80,7 +82,7 @@ const Archive = () => {
   // Delete an event from the archive
   const deleteEvent = async (eventId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/events/${eventId}`, {
+      const response = await fetch(`${API_URL}/api/events/${eventId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete event");
@@ -128,7 +130,7 @@ const Archive = () => {
             <div key={event._id} className="event-card">
               {event.image_url && (
                 <img 
-                  src={`http://localhost:5000${event.image_url}`} 
+                  src={`${API_URL}${event.image_url}`} 
                   alt={event.title} 
                   className="event-image" 
                 />
