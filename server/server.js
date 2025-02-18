@@ -10,33 +10,21 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-  console.error("\u274C MONGO_URI is missing in .env file");
+  console.error("❌ MONGO_URI is missing in .env file");
   process.exit(1);
 }
 
-// CORS Configuration
-app.use(cors({
-  origin: ["https://your-frontend-url.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
-
 // Middleware
 app.use(express.json());
+app.use(cors({ origin: "*" }));
 app.use("/uploads", express.static("uploads"));
 
-// Debugging Middleware for Requests
-app.use((req, res, next) => {
-  console.log(`\u2705 ${req.method} Request to ${req.url}`);
-  next();
-});
-
-// Connect to MongoDB
+// Connect to MongoDB with better error handling
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("\u2705 MongoDB Connected Successfully"))
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch((err) => {
-    console.error("\u274C MongoDB Connection Error:", err.message);
+    console.error("❌ MongoDB Connection Error:", err.message);
     process.exit(1);
   });
 
@@ -44,7 +32,7 @@ mongoose
 const eventSchema = new mongoose.Schema({
   title: String,
   description: String,
-  event_date: String,
+  event_date: { type: Date, required: true },
   time: String,
   location: String,
   organizer: String,
@@ -67,29 +55,61 @@ const upload = multer({ storage });
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("Eventify API is running...");
+  res.send("✅ Eventify API is running...");
 });
 
-// Fetch all events
+// Upcoming events route
+app.get("/api/events/upcoming", async (req, res) => {
+  try {
+    const today = new Date();
+    const upcomingEvents = await Event.find({
+      event_date: { $gte: today },
+    }).sort({ event_date: 1 });
+
+    res.json(upcomingEvents);
+  } catch (error) {
+    res.status(500).json({ error: "❌ Failed to fetch upcoming events" });
+  }
+});
+
+// Archived events route
+app.get("/api/events/archived", async (req, res) => {
+  try {
+    const archivedEvents = await Event.find({ is_archived: true });
+    res.json(archivedEvents);
+  } catch (error) {
+    res.status(500).json({ error: "❌ Failed to fetch archived events" });
+  }
+});
+
+// Favorite events route
+app.get("/api/events/favorites", async (req, res) => {
+  try {
+    const favoriteEvents = await Event.find({ is_favorite: true });
+    res.json(favoriteEvents);
+  } catch (error) {
+    res.status(500).json({ error: "❌ Failed to fetch favorite events" });
+  }
+});
+
+// List all events
 app.get("/api/events", async (req, res) => {
   try {
-    const events = await Event.find().exec();
+    const events = await Event.find().sort({ event_date: 1 });
     res.json(events);
   } catch (error) {
-    console.error("Error fetching events:", error);
-    res.status(500).json({ error: "Failed to fetch events" });
+    res.status(500).json({ error: "❌ Failed to fetch events" });
   }
 });
 
 // Fetch a single event by ID
 app.get("/api/events/:id", async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id).exec();
-    if (!event) return res.status(404).json({ error: "Event not found" });
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ error: "❌ Event not found" });
     res.json(event);
   } catch (error) {
-    console.error("Error fetching event:", error);
-    res.status(500).json({ error: "Failed to fetch the event" });
+    res.status(500).json({ error: "❌ Failed to fetch the event" });
   }
 });
 
@@ -97,60 +117,69 @@ app.get("/api/events/:id", async (req, res) => {
 app.post("/api/events", upload.single("image"), async (req, res) => {
   try {
     const { title, description, event_date, time, location, organizer, max_attendees, category } = req.body;
+    if (!title || !event_date) {
+      return res.status(400).json({ error: "❌ Title and event date are required" });
+    }
+
     const image_url = req.file ? `/uploads/${req.file.filename}` : null;
-    const newEvent = new Event({ title, description, event_date, time, location, organizer, max_attendees, category, image_url });
+    const newEvent = new Event({
+      title,
+      description,
+      event_date: new Date(event_date),
+      time,
+      location,
+      organizer,
+      max_attendees,
+      category,
+      image_url,
+    });
+
     await newEvent.save();
-    res.status(201).json({ message: "Event created successfully", event: newEvent });
+    res.status(201).json({ message: "✅ Event created successfully", event: newEvent });
   } catch (error) {
-    console.error("Error creating event:", error);
-    res.status(500).json({ error: "Failed to create event" });
+    res.status(500).json({ error: "❌ Failed to create event" });
   }
 });
 
 // Archive an event
 app.put("/api/events/:id/archive", async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, { is_archived: true }, { new: true }).exec();
-    if (!event) return res.status(404).json({ error: "Event not found" });
-    res.json({ message: "Event archived", event });
+    const event = await Event.findByIdAndUpdate(req.params.id, { is_archived: true }, { new: true });
+    if (!event) return res.status(404).json({ error: "❌ Event not found" });
+    res.json({ message: "✅ Event archived", event });
   } catch (error) {
-    console.error("Error archiving event:", error);
-    res.status(500).json({ error: "Failed to archive event" });
+    res.status(500).json({ error: "❌ Failed to archive event" });
   }
 });
 
-// Toggle favorite status for an event
+// Toggle favorite status
 app.put("/api/events/:id/favorite", async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id).exec();
-    if (!event) return res.status(404).json({ error: "Event not found" });
-    
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ error: "❌ Event not found" });
+
     event.is_favorite = !event.is_favorite;
     await event.save();
-    
-    res.json({ 
-      message: `Event ${event.is_favorite ? 'marked as favorite' : 'removed from favorites'}`, 
-      event 
-    });
+
+    res.json({ message: `✅ Event ${event.is_favorite ? "marked as favorite" : "removed from favorites"}`, event });
   } catch (error) {
-    console.error("Error updating favorite status:", error);
-    res.status(500).json({ error: "Failed to update favorite status" });
+    res.status(500).json({ error: "❌ Failed to update favorite status" });
   }
 });
 
 // Delete an event
 app.delete("/api/events/:id", async (req, res) => {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id).exec();
-    if (!event) return res.status(404).json({ error: "Event not found" });
-    res.json({ message: "Event deleted successfully." });
+    const event = await Event.findByIdAndDelete(req.params.id);
+    if (!event) return res.status(404).json({ error: "❌ Event not found" });
+
+    res.json({ message: "✅ Event deleted successfully" });
   } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).json({ error: "Failed to delete event." });
+    res.status(500).json({ error: "❌ Failed to delete event" });
   }
 });
 
-// Start Server
+// Start the server
 app.listen(PORT, () => {
-  console.log(`\u2728 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
